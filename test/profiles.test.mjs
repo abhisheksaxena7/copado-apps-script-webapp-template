@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { test } from 'node:test';
-import { resolve } from 'node:path';
+import { join, resolve } from 'node:path';
 
 test('all profiles initialize, validate, and pass browser smoke tests', () => {
   const originalProfile = JSON.parse(readFileSync('project.config.json', 'utf8')).profile;
@@ -50,4 +51,35 @@ test('Canvas build reports its portable source contract', () => {
   assert.match(build, /Ensure src\/App\.tsx exists and default-exports/);
   assert.match(adapter, /from '\.\.\/\.\.\/\.\.\/src\/App'/);
   assert.doesNotMatch(adapter, /\/Users\/|[A-Za-z]:\\/);
+});
+
+test('stable redeploy helper supports default and explicit clasp project files', () => {
+  const fixture = mkdtempSync(join(tmpdir(), 'clasp-redeploy-'));
+  const fakeClasp = join(fixture, 'clasp');
+  const state = join(fixture, 'redeployed');
+  const log = join(fixture, 'calls.log');
+  writeFileSync(fakeClasp, `#!/usr/bin/env bash
+set -eu
+if [[ "\${1:-}" == "-P" ]]; then printf 'project:%s\\n' "$2" >> "${log}"; shift 2; fi
+case "$1" in
+  deployments) if [[ -f "${state}" ]]; then echo "stable-id @2"; else echo "stable-id @1"; fi ;;
+  create-version) echo "Created version 2" ;;
+  redeploy) touch "${state}" ;;
+  *) exit 2 ;;
+esac
+`);
+  chmodSync(fakeClasp, 0o755);
+  const environment = {
+    ...process.env,
+    PATH: `${fixture}:${process.env.PATH}`,
+    DEPLOYMENT_ID: 'stable-id',
+    DEPLOY_DESCRIPTION: 'fixture update'
+  };
+  execFileSync('bash', ['scripts/redeploy-stable.sh'], { env: environment, stdio: 'inherit' });
+  rmSync(state);
+  execFileSync('bash', ['scripts/redeploy-stable.sh'], {
+    env: { ...environment, CLASP_PROJECT_FILE: '.clasp-prod.json' },
+    stdio: 'inherit'
+  });
+  assert.match(readFileSync(log, 'utf8'), /project:\.clasp-prod\.json/);
 });

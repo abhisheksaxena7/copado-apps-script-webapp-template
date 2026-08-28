@@ -12,4 +12,6 @@ Do not publish this repository until an authorized human confirms:
 - The local static, Sheet, and Canvas test matrix passes.
 - A live domain-restricted canary proves stable-URL redeployment before a `v1.0.0` release.
 
+The live canary requirement passed on 2026-08-28: fictional read-only Sheet data, domain rejection, and one unchanged `/exec` URL advancing from version 1 to version 2. The paired skill's cross-agent and embed gates still govern the `v1.0.0` release.
+
 Record approval in the authorized internal system; do not put private approver details here.

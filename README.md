@@ -27,6 +27,8 @@ For Sheet projects, also pass `--sheet-property MY_TOOL_SHEET_ID`. For Canvas pr
 
 The initializer never creates a GitHub repository, uploads credentials, authenticates Google, or deploys production. Those are human gates.
 
+Prerequisites are Node.js 20 or newer, npm, and git. Google setup later requires a Copado Google Workspace account and `clasp`; GitHub automation requires an explicitly authorized `gh` session. Keep the generated repository private because its configuration and future app data are outside the public scaffold's security boundary.
+
 ## Local workflow
 
 ```bash
@@ -63,4 +65,8 @@ See `docs/PROJECT.md`, `docs/DESIGN.md`, `apps-script/README.md`, and `AGENTS.md
 
 ## Release status
 
-The repository owner confirmed provenance, Copado branding/republication approval, personal-account publication, and MIT compatibility. The public template is released as `v0.1.4`; promotion to `v1.0.0` still requires the live Google Apps Script canary.
+The repository owner confirmed provenance, Copado branding/republication approval, personal-account publication, and MIT compatibility. The public template is released as `v0.1.4`.
+
+On 2026-08-28, a private read-only Sheet canary with fictional data retained one domain-restricted `/exec` URL while its deployment advanced from Apps Script version 1 to version 2; non-domain access was rejected. No IDs, URLs, credentials, or data from that canary belong in this repository.
+
+Promotion to `v1.0.0` remains gated on the paired skill's deferred Claude Code runtime canary, approved iframe/SalesHood testing where applicable, and a final staged-content review. See the catalog's `docs/COMPATIBILITY_AND_RELEASES.md` for the paired release procedure.

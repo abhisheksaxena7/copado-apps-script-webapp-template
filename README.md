@@ -63,4 +63,4 @@ See `docs/PROJECT.md`, `docs/DESIGN.md`, `apps-script/README.md`, and `AGENTS.md
 
 ## Release status
 
-The repository owner confirmed provenance, Copado branding/republication approval, personal-account publication, and MIT compatibility. The public template is released as `v0.1.3`; promotion to `v1.0.0` still requires the live Google Apps Script canary.
+The repository owner confirmed provenance, Copado branding/republication approval, personal-account publication, and MIT compatibility. The public template is released as `v0.1.4`; promotion to `v1.0.0` still requires the live Google Apps Script canary.

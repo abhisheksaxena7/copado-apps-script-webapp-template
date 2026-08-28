@@ -62,9 +62,18 @@ test('stable redeploy helper supports default and explicit clasp project files',
 set -eu
 if [[ "\${1:-}" == "-P" ]]; then printf 'project:%s\\n' "$2" >> "${log}"; shift 2; fi
 case "$1" in
-  deployments) if [[ -f "${state}" ]]; then echo "stable-id @2"; else echo "stable-id @1"; fi ;;
+  deployments)
+    if [[ ! -f "${state}" ]]; then
+      echo "stable-id @1"
+    elif [[ "$(cat "${state}")" -eq 0 ]]; then
+      echo "stable-id @1"
+      echo 1 > "${state}"
+    else
+      echo "stable-id @2"
+    fi
+    ;;
   create-version) echo "Created version 2" ;;
-  redeploy) touch "${state}" ;;
+  redeploy) echo 0 > "${state}" ;;
   *) exit 2 ;;
 esac
 `);
@@ -73,7 +82,9 @@ esac
     ...process.env,
     PATH: `${fixture}:${process.env.PATH}`,
     DEPLOYMENT_ID: 'stable-id',
-    DEPLOY_DESCRIPTION: 'fixture update'
+    DEPLOY_DESCRIPTION: 'fixture update',
+    VERIFY_ATTEMPTS: '3',
+    VERIFY_DELAY_SECONDS: '0'
   };
   execFileSync('bash', ['scripts/redeploy-stable.sh'], { env: environment, stdio: 'inherit' });
   rmSync(state);

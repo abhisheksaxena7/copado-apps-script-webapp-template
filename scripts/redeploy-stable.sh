@@ -35,8 +35,18 @@ if [[ -n "$previous_version" && "$new_version" -le "$previous_version" ]]; then
 fi
 
 run_clasp redeploy "$DEPLOYMENT_ID" -V "$new_version" -d "$DEPLOY_DESCRIPTION"
-live_version="$(deployments | awk -v id="$DEPLOYMENT_ID" '$0 ~ id { for (i=1; i<=NF; i++) if ($i ~ /^@[0-9]+$/) { print $i; exit } }')"
 EXPECTED_VERSION="@$new_version"
+VERIFY_ATTEMPTS="${VERIFY_ATTEMPTS:-5}"
+VERIFY_DELAY_SECONDS="${VERIFY_DELAY_SECONDS:-2}"
+live_version=""
+for ((attempt = 1; attempt <= VERIFY_ATTEMPTS; attempt++)); do
+  live_version="$(deployments | awk -v id="$DEPLOYMENT_ID" '$0 ~ id { for (i=1; i<=NF; i++) if ($i ~ /^@[0-9]+$/) { print $i; exit } }')"
+  [[ "$live_version" == "$EXPECTED_VERSION" ]] && break
+  if [[ "$attempt" -lt "$VERIFY_ATTEMPTS" ]]; then
+    echo "Deployment still reports ${live_version:-nothing}; retrying pointer verification ($attempt/$VERIFY_ATTEMPTS)."
+    sleep "$VERIFY_DELAY_SECONDS"
+  fi
+done
 if [[ "$live_version" != "$EXPECTED_VERSION" ]]; then
   echo "Stable deployment points to ${live_version:-nothing}; expected $EXPECTED_VERSION." >&2
   exit 1

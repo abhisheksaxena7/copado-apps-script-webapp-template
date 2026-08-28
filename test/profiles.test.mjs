@@ -10,6 +10,10 @@ test('all profiles initialize, validate, and pass browser smoke tests', () => {
       execFileSync(process.execPath, ['scripts/init-project.mjs', '--profile', profile], { stdio: 'inherit' });
       execFileSync(process.execPath, ['test/smoke.mjs'], { stdio: 'inherit' });
       const manifest = JSON.parse(readFileSync('apps-script/appsscript.json', 'utf8'));
+      const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
+      const packageLock = JSON.parse(readFileSync('package-lock.json', 'utf8'));
+      assert.equal(packageLock.name, packageJson.name);
+      assert.equal(packageLock.packages[''].name, packageJson.name);
       assert.equal(manifest.webapp.access, 'DOMAIN');
       assert.equal(manifest.webapp.executeAs, 'USER_DEPLOYING');
       if (profile === 'sheet') {

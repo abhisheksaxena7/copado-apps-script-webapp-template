@@ -32,6 +32,15 @@ const packageJson = JSON.parse(await readFile(packagePath, 'utf8'));
 packageJson.name = config.name;
 packageJson.private = true;
 await writeFile(packagePath, JSON.stringify(packageJson, null, 2) + '\n');
+try {
+  const lockPath = resolve(root, 'package-lock.json');
+  const packageLock = JSON.parse(await readFile(lockPath, 'utf8'));
+  packageLock.name = config.name;
+  if (packageLock.packages?.['']) packageLock.packages[''].name = config.name;
+  await writeFile(lockPath, JSON.stringify(packageLock, null, 2) + '\n');
+} catch (error) {
+  if (error.code !== 'ENOENT') throw error;
+}
 
 const replacements = {
   '{{TITLE}}': config.title,

@@ -63,4 +63,4 @@ See `docs/PROJECT.md`, `docs/DESIGN.md`, `apps-script/README.md`, and `AGENTS.md
 
 ## Release status
 
-The repository owner confirmed provenance, Copado branding/republication approval, personal-account publication, and MIT compatibility. GitHub publication still requires an authenticated `abhisheksaxena7` CLI session; promotion beyond `v0.1.0` still requires the live canary.
+The repository owner confirmed provenance, Copado branding/republication approval, personal-account publication, and MIT compatibility. The public template is released as `v0.1.1`; promotion to `v1.0.0` still requires the live Google Apps Script canary.

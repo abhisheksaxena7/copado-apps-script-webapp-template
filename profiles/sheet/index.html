@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{TITLE}}</title>
+  <style>
+    :root { font-family: Montserrat, Arial, sans-serif; color: #27282d; background: #f8f9ff; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    main { width: min(960px, calc(100% - 24px)); margin: 24px auto; }
+    header { padding: 28px; color: white; background: #000; border-radius: 16px; }
+    .kicker { color: #00c3ef; font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    h1 { margin: 8px 0 0; }
+    .controls, .card, .notice { margin-top: 16px; padding: 20px; background: white; border: 1px solid #e6e8ef; border-radius: 16px; }
+    input { width: 100%; padding: 10px 14px; border: 1px solid #c3c5d1; border-radius: 999px; }
+    .card a { color: #006278; }
+  </style>
+</head>
+<body>
+  <main {{SMOKE_ATTRIBUTE}}>
+    <header><div class="kicker">{{APP_CHROME}}</div><h1>{{TITLE}}</h1></header>
+    <div class="controls"><label>Search <input id="search" type="search"></label></div>
+    <div id="list"></div>
+    <div class="notice" id="empty" hidden>No matching items.</div>
+  </main>
+  <?!= dataTag ?>
+  <script>
+    'use strict';
+    function offsetDate(days) {
+      var date = new Date(); date.setDate(date.getDate() + days);
+      return date.toISOString().slice(0, 10);
+    }
+    var samples = [
+      { date: offsetDate(-1), title: 'Sample item', category: 'Alpha', summary: 'Local fallback data.', link: '' },
+      { date: offsetDate(-3), title: 'Linked sample', category: 'Beta', summary: 'Replace with whitelisted Sheet fields.', link: 'https://www.copado.com' }
+    ];
+    var items = typeof window.__ITEMS__ === 'undefined' ? samples : window.__ITEMS__;
+    var query = '';
+    function render() {
+      var list = document.getElementById('list');
+      list.textContent = '';
+      var visible = items.filter(function (item) {
+        return (item.title + ' ' + item.category + ' ' + item.summary).toLowerCase().indexOf(query) !== -1;
+      });
+      visible.forEach(function (item) {
+        var article = document.createElement('article'); article.className = 'card';
+        var title = document.createElement('h2');
+        if (item.link) {
+          var link = document.createElement('a'); link.href = item.link; link.target = '_blank'; link.rel = 'noopener'; link.textContent = item.title; title.appendChild(link);
+        } else title.textContent = item.title;
+        article.appendChild(title);
+        var summary = document.createElement('p'); summary.textContent = item.summary; article.appendChild(summary);
+        list.appendChild(article);
+      });
+      document.getElementById('empty').hidden = visible.length !== 0;
+    }
+    document.getElementById('search').addEventListener('input', function (event) {
+      query = event.target.value.trim().toLowerCase(); render();
+    });
+    render();
+  </script>
+</body>
+</html>

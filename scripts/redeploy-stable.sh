@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+: "${DEPLOYMENT_ID:?Set DEPLOYMENT_ID to the existing stable deployment.}"
+: "${DEPLOY_DESCRIPTION:?Set DEPLOY_DESCRIPTION.}"
+
+if [[ "$DEPLOYMENT_ID" == REPLACE_* || "$DEPLOYMENT_ID" == \<* ]]; then
+  echo "Refusing to deploy with a placeholder deployment ID." >&2
+  exit 1
+fi
+
+clasp_args=()
+if [[ -n "${CLASP_PROJECT_FILE:-}" ]]; then
+  clasp_args=(-P "$CLASP_PROJECT_FILE")
+fi
+
+deployments() {
+  clasp "${clasp_args[@]}" deployments
+}
+
+previous_version="$(deployments | awk -v id="$DEPLOYMENT_ID" '$0 ~ id { for (i=1; i<=NF; i++) if ($i ~ /^@[0-9]+$/) { sub(/^@/, "", $i); print $i; exit } }')"
+create_output="$(clasp "${clasp_args[@]}" create-version "$DEPLOY_DESCRIPTION")"
+new_version="$(printf '%s\n' "$create_output" | awk 'match(tolower($0), /version [0-9]+/) { text=substr($0, RSTART, RLENGTH); sub(/[^0-9]*/, "", text); print text }' | tail -n 1)"
+
+if [[ -z "$new_version" ]]; then
+  echo "Could not parse the new Apps Script version." >&2
+  exit 1
+fi
+if [[ -n "$previous_version" && "$new_version" -le "$previous_version" ]]; then
+  echo "New version $new_version is not newer than live version $previous_version." >&2
+  exit 1
+fi
+
+clasp "${clasp_args[@]}" redeploy "$DEPLOYMENT_ID" -V "$new_version" -d "$DEPLOY_DESCRIPTION"
+live_version="$(deployments | awk -v id="$DEPLOYMENT_ID" '$0 ~ id { for (i=1; i<=NF; i++) if ($i ~ /^@[0-9]+$/) { print $i; exit } }')"
+EXPECTED_VERSION="@$new_version"
+if [[ "$live_version" != "$EXPECTED_VERSION" ]]; then
+  echo "Stable deployment points to ${live_version:-nothing}; expected $EXPECTED_VERSION." >&2
+  exit 1
+fi
+echo "Stable deployment advanced from @${previous_version:-none} to $EXPECTED_VERSION."

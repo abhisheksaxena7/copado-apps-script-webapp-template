@@ -1,0 +1,11 @@
+node_modules/
+playwright-report/
+test-results/
+.DS_Store
+.env
+.env.*
+.clasprc.json
+.clasp.json
+.clasp-prod.json
+credentials.json
+apps-script/index.html

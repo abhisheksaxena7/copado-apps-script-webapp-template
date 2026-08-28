@@ -1,0 +1,15 @@
+---
+description: Reinforce domain-restricted, least-privilege Apps Script behavior
+globs: "{apps-script/**,profiles/**,index.html,src/**,recipes/**}"
+alwaysApply: false
+---
+
+# Apps Script safety
+
+`AGENTS.md` is authoritative.
+
+- Keep web-app access `DOMAIN` and execution `USER_DEPLOYING`.
+- Static/Canvas use no OAuth scopes. Sheet uses Advanced Sheets Service with `spreadsheets.readonly`.
+- Whitelist fields before HTML serialization and escape closing-script sequences.
+- Keep sample data fictional, pages self-contained, and mobile smoke selectors intact.
+- Run `npm test` after changes.

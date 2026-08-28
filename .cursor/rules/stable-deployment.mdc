@@ -1,0 +1,14 @@
+---
+description: Preserve stable Apps Script deployment URLs and human production gates
+globs: "{.github/workflows/**,scripts/redeploy-stable.sh}"
+alwaysApply: false
+---
+
+# Stable deployment
+
+`AGENTS.md` is authoritative.
+
+- Update an existing environment with `create-version` plus `redeploy`; never create a replacement deployment.
+- Verify the deployment ID points at the new version before success.
+- Never print `CLASPRC_JSON`.
+- Keep production manual, confirmation-protected, and behind required reviewers.

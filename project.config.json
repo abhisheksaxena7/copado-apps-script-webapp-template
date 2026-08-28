@@ -1,0 +1,9 @@
+{
+  "name": "copado-apps-script-webapp",
+  "title": "Copado Internal Tool",
+  "profile": "static",
+  "storageKey": "copado-apps-script-webapp",
+  "appChrome": "Copado · Internal",
+  "smokeSelector": "[data-smoke-ready]",
+  "sheetProperty": "APP_SHEET_ID"
+}

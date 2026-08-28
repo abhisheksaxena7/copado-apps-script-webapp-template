@@ -1,0 +1,52 @@
+name: Deploy production
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type deploy-production to confirm
+        required: true
+        type: string
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    if: ${{ inputs.confirm == 'deploy-production' }}
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
+      - run: npm install --global @google/clasp@3.3.0
+      - name: Authenticate without exposing the OAuth token
+        env:
+          CLASPRC_JSON: ${{ secrets.CLASPRC_JSON_PROD }}
+        run: |
+          test -n "$CLASPRC_JSON"
+          umask 077
+          printf '%s' "$CLASPRC_JSON" > "$HOME/.clasprc.json"
+      - name: Configure the production Apps Script project
+        env:
+          SCRIPT_ID: ${{ vars.PROD_SCRIPT_ID }}
+        run: |
+          test -n "$SCRIPT_ID"
+          printf '{"scriptId":"%s","rootDir":"apps-script"}\n' "$SCRIPT_ID" > .clasp-prod.json
+      - run: clasp -P .clasp-prod.json push --force
+      - name: Advance the stable production deployment
+        env:
+          CLASP_PROJECT_FILE: .clasp-prod.json
+          DEPLOYMENT_ID: ${{ vars.PROD_DEPLOYMENT_ID }}
+          DEPLOY_DESCRIPTION: production-${{ github.sha }}
+        run: scripts/redeploy-stable.sh

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Copado Internal Tool</title>
+  <style>
+    :root { font-family: Montserrat, Arial, sans-serif; color: #27282d; background: #f8f9ff; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    main { width: min(960px, calc(100% - 24px)); margin: 24px auto; }
+    header { padding: 28px; color: white; background: #000; border-radius: 16px; }
+    .kicker { color: #00c3ef; font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    h1 { margin: 8px 0 0; }
+    .card { margin-top: 16px; padding: 24px; background: white; border: 1px solid #e6e8ef; border-radius: 16px; }
+    button { padding: 10px 18px; border: 1px solid #006278; border-radius: 999px; color: #006278; background: white; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <main data-smoke-ready>
+    <header><div class="kicker">Copado · Internal</div><h1>Copado Internal Tool</h1></header>
+    <section class="card">
+      <h2>Starter page</h2>
+      <p id="message">This static profile uses no Google OAuth scopes.</p>
+      <button id="action" type="button">Test interaction</button>
+    </section>
+  </main>
+  <script>
+    'use strict';
+    document.getElementById('action').addEventListener('click', function () {
+      document.getElementById('message').textContent = 'Interaction works.';
+    });
+  </script>
+</body>
+</html>

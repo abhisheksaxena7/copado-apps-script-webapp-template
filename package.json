@@ -1,0 +1,23 @@
+{
+  "name": "copado-apps-script-webapp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Private-by-default Copado Apps Script web app scaffold",
+  "type": "module",
+  "scripts": {
+    "init": "node scripts/init-project.mjs",
+    "build:canvas": "node recipes/canvas-publish/build.mjs",
+    "sync": "node scripts/sync-apps-script-html.mjs",
+    "validate": "node scripts/validate-config.mjs",
+    "test": "node --test test/*.test.mjs && node test/smoke.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "playwright": "^1.51.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

@@ -5,6 +5,7 @@ import { test } from 'node:test';
 import { resolve } from 'node:path';
 
 test('all profiles initialize, validate, and pass browser smoke tests', () => {
+  const originalProfile = JSON.parse(readFileSync('project.config.json', 'utf8')).profile;
   try {
     for (const profile of ['static', 'sheet', 'canvas']) {
       execFileSync(process.execPath, ['scripts/init-project.mjs', '--profile', profile], { stdio: 'inherit' });
@@ -26,7 +27,7 @@ test('all profiles initialize, validate, and pass browser smoke tests', () => {
       }
     }
   } finally {
-    execFileSync(process.execPath, ['scripts/init-project.mjs', '--profile', 'static'], { stdio: 'inherit' });
+    execFileSync(process.execPath, ['scripts/init-project.mjs', '--profile', originalProfile], { stdio: 'inherit' });
   }
 });
 
